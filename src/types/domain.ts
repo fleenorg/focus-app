@@ -8,6 +8,8 @@ export interface TimerSettings {
   longBreakInterval: number;
   soundEnabled: boolean;
   notificationsEnabled: boolean;
+  theme: "dark" | "light";
+  timerStyle: "classic" | "flip";
 }
 
 export interface TimerState {

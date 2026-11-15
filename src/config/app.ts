@@ -12,6 +12,8 @@ export const DEFAULT_TIMER_SETTINGS = {
   longBreakInterval: 4,
   soundEnabled: false,
   notificationsEnabled: false,
+  theme: "dark",
+  timerStyle: "classic",
 } as const;
 
 export const TIMER_LIMITS = {

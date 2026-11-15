@@ -49,3 +49,34 @@ body {
 ::selection {
   background: color-mix(in srgb, var(--accent) 35%, transparent);
 }
+
+[data-theme="light"] {
+  --background: #f6f6f4;
+  --foreground: #16161a;
+  --surface: #ffffff;
+  --surface-2: #ececea;
+  --muted: #62626b;
+  --border: #d8d8d4;
+  /* keep --accent and --danger, or adjust them if they look off */
+}
+
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 1s ease,
+    color 1s ease,
+    border-color 1s ease,
+    fill 1s ease,
+    stroke 1s ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: none !important;
+  }
+}

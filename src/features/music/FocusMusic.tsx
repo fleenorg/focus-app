@@ -21,6 +21,7 @@ export function FocusMusic() {
   const playerRef = useRef<YT.Player | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft(musicUrl);
   }, [musicUrl]);
 
