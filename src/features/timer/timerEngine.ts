@@ -73,6 +73,14 @@ export function parseTimerSettings(value: unknown): TimerSettings | null {
       value.notificationsEnabled,
       DEFAULT_TIMER_SETTINGS.notificationsEnabled,
     ),
+    theme:
+      value.theme === "light" || value.theme === "dark"
+        ? value.theme
+        : DEFAULT_TIMER_SETTINGS.theme,
+    timerStyle:
+      value.timerStyle === "flip" || value.timerStyle === "classic"
+        ? value.timerStyle
+        : DEFAULT_TIMER_SETTINGS.timerStyle,
   };
 }
 

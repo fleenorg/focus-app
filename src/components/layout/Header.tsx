@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { BarChart3, Settings, Timer } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/features/app/ThemeToggle";
 
 const links = [
   { href: "/", label: "Focus", icon: Timer },
@@ -58,6 +59,9 @@ export function Header() {
           >
             Rooms
           </span>
+          <div className="ml-2">
+            <ThemeToggle />
+          </div>
         </nav>
       </div>
     </header>

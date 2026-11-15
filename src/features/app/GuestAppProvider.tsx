@@ -38,6 +38,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useLayoutEffect,
 } from "react";
 
 interface GuestAppValue {
@@ -108,10 +109,12 @@ export function GuestAppProvider({ children }: { children: React.ReactNode }) {
   const tasksRef = useRef(tasks);
   const activeTaskIdRef = useRef(activeTaskId);
 
+useLayoutEffect(() => {
   timerRef.current = timer;
   settingsRef.current = settings;
   tasksRef.current = tasks;
   activeTaskIdRef.current = activeTaskId;
+}, [timer, settings, tasks, activeTaskId]);
 
   const recordCompletion = useCallback(
     (event: SessionCompletedEvent) => {
@@ -182,8 +185,9 @@ export function GuestAppProvider({ children }: { children: React.ReactNode }) {
     },
     [applyTimerResult],
   );
-
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
+
     const storedSettings =
       readJson(STORAGE_KEYS.settings, parseTimerSettings) ?? {
         ...DEFAULT_TIMER_SETTINGS,
@@ -218,6 +222,7 @@ export function GuestAppProvider({ children }: { children: React.ReactNode }) {
     }
     setReady(true);
   }, [recordCompletion]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!ready) {
@@ -229,6 +234,8 @@ export function GuestAppProvider({ children }: { children: React.ReactNode }) {
     writeJson(STORAGE_KEYS.sessions, sessions);
     writeJson(STORAGE_KEYS.music, { lastUrl: musicUrl, collapsed: musicCollapsed });
     writeJson(STORAGE_KEYS.ui, { activeTaskId });
+
+    
   }, [
     ready,
     guestId,
@@ -239,6 +246,10 @@ export function GuestAppProvider({ children }: { children: React.ReactNode }) {
     musicCollapsed,
     activeTaskId,
   ]);
+
+  useEffect(() => {
+  document.documentElement.dataset.theme = settings.theme;
+}, [settings.theme]);
 
   useEffect(() => {
     if (!ready) {
@@ -412,5 +423,12 @@ export function useGuestApp(): GuestAppValue {
 
 export function useAppStats() {
   const { sessions } = useGuestApp();
-  return buildStats(sessions, Date.now());
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return useMemo(() => buildStats(sessions, now), [sessions, now]);
 }

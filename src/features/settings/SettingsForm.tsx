@@ -17,6 +17,7 @@ export function SettingsForm() {
   const [confirmReset, setConfirmReset] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft(settings);
   }, [settings]);
 
