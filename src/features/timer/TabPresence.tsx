@@ -5,11 +5,9 @@ import { useGuestApp } from "@/features/app/GuestAppProvider";
 import { formatDocumentTitle } from "@/lib/time";
 import { useEffect, useRef } from "react";
 
-function drawFavicon(
-  canvas: HTMLCanvasElement,
-  progress: number,
-  mode: "idle" | "running" | "paused" | "complete",
-) {
+type FaviconMode = "idle" | "running" | "paused" | "complete";
+
+function drawFavicon(canvas: HTMLCanvasElement, progress: number, mode: FaviconMode) {
   const context = canvas.getContext("2d");
   if (!context) {
     return;
@@ -88,11 +86,10 @@ function applyFavicon(href: string) {
 export function TabPresence() {
   const { timer, settings, ready, lastCompletedAt } = useGuestApp();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const timerRef = useRef(timer);
+  timerRef.current = timer;
   const title = formatDocumentTitle(timer, APP.name);
-  const progress = timer.durationMs === 0 ? 0 : 1 - timer.remainingMs / timer.durationMs;
   const bucket = Math.floor(timer.remainingMs / 15_000);
-  const completed =
-    lastCompletedAt !== null && Date.now() - lastCompletedAt < 8_000;
 
   useEffect(() => {
     if (!ready) {
@@ -109,23 +106,41 @@ export function TabPresence() {
     canvas.width = 32;
     canvas.height = 32;
     canvasRef.current = canvas;
-    const mode = completed
+    const current = timerRef.current;
+    const progress = current.durationMs === 0 ? 0 : 1 - current.remainingMs / current.durationMs;
+    const freshlyDone = lastCompletedAt !== null && Date.now() - lastCompletedAt < 8_000;
+    const mode: FaviconMode = freshlyDone
       ? "complete"
-      : timer.status === "paused"
+      : current.status === "paused"
         ? "paused"
-        : timer.status === "running"
+        : current.status === "running"
           ? "running"
           : "idle";
     drawFavicon(canvas, progress, mode);
     applyFavicon(canvas.toDataURL("image/png"));
+
+    if (!freshlyDone || lastCompletedAt === null) {
+      return;
+    }
+    const delay = Math.max(0, 8_000 - (Date.now() - lastCompletedAt));
+    const timeout = window.setTimeout(() => {
+      const settled =
+        timerRef.current.status === "paused"
+          ? "paused"
+          : timerRef.current.status === "running"
+            ? "running"
+            : "idle";
+      drawFavicon(canvas, progress, settled);
+      applyFavicon(canvas.toDataURL("image/png"));
+    }, delay);
+    return () => window.clearTimeout(timeout);
   }, [
     ready,
     timer.status,
     timer.sessionType,
+    timer.durationMs,
     settings.theme,
     bucket,
-    completed,
-    progress,
     lastCompletedAt,
   ]);
 
