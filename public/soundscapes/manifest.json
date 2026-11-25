@@ -1,0 +1,12 @@
+{
+  "note": "These ambiences are synthesized in the app. src stays null until a properly licensed recording is added under public/soundscapes. Do not point src at an unlicensed or unverified URL.",
+  "sounds": [
+    { "id": "rain", "label": "Rain", "src": null },
+    { "id": "fireplace", "label": "Fireplace", "src": null },
+    { "id": "forest", "label": "Forest", "src": null },
+    { "id": "ocean", "label": "Ocean", "src": null },
+    { "id": "brown", "label": "Brown noise", "src": null },
+    { "id": "white", "label": "White noise", "src": null },
+    { "id": "cafe", "label": "Café", "src": null }
+  ]
+}

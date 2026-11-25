@@ -14,6 +14,7 @@ export const DEFAULT_TIMER_SETTINGS = {
   notificationsEnabled: false,
   theme: "dark",
   timerStyle: "classic",
+  quickAddThresholdMinutes: 5,
 } as const;
 
 export const TIMER_LIMITS = {
@@ -21,7 +22,13 @@ export const TIMER_LIMITS = {
   shortBreakMinutes: { min: 1, max: 30 },
   longBreakMinutes: { min: 1, max: 60 },
   longBreakInterval: { min: 2, max: 12 },
+  quickAddThresholdMinutes: { min: 1, max: 30 },
 } as const;
+
+/** One-session extensions cannot push a countdown past this length. */
+export const MAX_SESSION_MS = 6 * 60 * 60 * 1000;
+
+export const QUICK_ADD_MINUTES = [5, 10, 15] as const;
 
 export const STORAGE_KEYS = {
   guestId: "lumen.v1.guestId",
@@ -31,4 +38,5 @@ export const STORAGE_KEYS = {
   sessions: "lumen.v1.sessions",
   music: "lumen.v1.music",
   ui: "lumen.v1.ui",
+  soundscape: "lumen.v1.soundscape",
 } as const;

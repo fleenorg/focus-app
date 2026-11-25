@@ -1,4 +1,4 @@
-import type { SessionType, TimerSettings } from "@/types/domain";
+import type { SessionType, TimerSettings, TimerState } from "@/types/domain";
 
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -77,4 +77,25 @@ export function sessionLabel(sessionType: SessionType): string {
     case "longBreak":
       return "Long Break";
   }
+}
+
+export function runningSessionTitle(sessionType: SessionType): string {
+  if (sessionType === "focus") {
+    return "Deep Focus";
+  }
+  return sessionLabel(sessionType);
+}
+
+export function formatDocumentTitle(
+  timer: Pick<TimerState, "status" | "sessionType" | "remainingMs">,
+  appName: string,
+): string {
+  if (timer.status === "idle") {
+    return appName;
+  }
+  const clock = formatCountdown(timer.remainingMs);
+  if (timer.status === "paused") {
+    return `(Paused) ${clock} | ${appName}`;
+  }
+  return `(${clock}) ${runningSessionTitle(timer.sessionType)} | ${appName}`;
 }
