@@ -1,4 +1,4 @@
-import { DEFAULT_TIMER_SETTINGS, TIMER_LIMITS } from "@/config/app";
+import { DEFAULT_TIMER_SETTINGS, MAX_SESSION_MS, TIMER_LIMITS } from "@/config/app";
 import { createId } from "@/lib/id";
 import { isRecord, asBoolean, asFiniteNumber, asString } from "@/lib/storage";
 import { clamp, durationMsFor, remainingFromDeadline } from "@/lib/time";
@@ -17,6 +17,7 @@ export type TimerAction =
   | { type: "RESET" }
   | { type: "SKIP" }
   | { type: "SET_SESSION"; sessionType: SessionType }
+  | { type: "ADD_TIME"; minutes: number }
   | { type: "SYNC" }
   | { type: "APPLY_SETTINGS" };
 
@@ -78,9 +79,19 @@ export function parseTimerSettings(value: unknown): TimerSettings | null {
         ? value.theme
         : DEFAULT_TIMER_SETTINGS.theme,
     timerStyle:
-      value.timerStyle === "flip" || value.timerStyle === "classic"
+      value.timerStyle === "flip" ||
+      value.timerStyle === "kitchen" ||
+      value.timerStyle === "classic"
         ? value.timerStyle
         : DEFAULT_TIMER_SETTINGS.timerStyle,
+    quickAddThresholdMinutes: clamp(
+      Math.round(
+        asFiniteNumber(value.quickAddThresholdMinutes) ??
+          DEFAULT_TIMER_SETTINGS.quickAddThresholdMinutes,
+      ),
+      TIMER_LIMITS.quickAddThresholdMinutes.min,
+      TIMER_LIMITS.quickAddThresholdMinutes.max,
+    ),
   };
 }
 
@@ -344,6 +355,32 @@ export function reduceTimer(
       );
       return {
         state: idleForType(nextType, settings, state),
+        completed: null,
+      };
+    }
+    case "ADD_TIME": {
+      if (!Number.isFinite(action.minutes) || action.minutes <= 0) {
+        return { state, completed: null };
+      }
+      const synced = reduceTimer(state, { type: "SYNC" }, now, settings);
+      if (synced.completed) {
+        return synced;
+      }
+      const room = MAX_SESSION_MS - synced.state.durationMs;
+      if (room <= 0) {
+        return { state: synced.state, completed: null };
+      }
+      const applied = Math.min(Math.round(action.minutes * 60_000), room);
+      const durationMs = synced.state.durationMs + applied;
+      const remainingMs = synced.state.remainingMs + applied;
+      return {
+        state: {
+          ...synced.state,
+          durationMs,
+          remainingMs,
+          deadlineAt:
+            synced.state.status === "running" ? now + remainingMs : synced.state.deadlineAt,
+        },
         completed: null,
       };
     }

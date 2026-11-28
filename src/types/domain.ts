@@ -1,5 +1,6 @@
 export type SessionType = "focus" | "shortBreak" | "longBreak";
 export type TimerStatus = "idle" | "running" | "paused";
+export type ClockStyle = "classic" | "flip" | "kitchen";
 
 export interface TimerSettings {
   focusMinutes: number;
@@ -9,7 +10,9 @@ export interface TimerSettings {
   soundEnabled: boolean;
   notificationsEnabled: boolean;
   theme: "dark" | "light";
-  timerStyle: "classic" | "flip";
+  timerStyle: ClockStyle;
+  /** Show +5 / +10 / +15 once remaining time is at or below this many minutes. */
+  quickAddThresholdMinutes: number;
 }
 
 export interface TimerState {
