@@ -49,6 +49,7 @@ interface GuestAppValue {
   tasks: Task[];
   activeTaskId: string | null;
   sessions: FocusSessionRecord[];
+  lastCompletedAt: number | null;
   musicUrl: string;
   musicCollapsed: boolean;
   dispatchTimer: (action: TimerAction) => void;
@@ -102,6 +103,7 @@ export function GuestAppProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const [sessions, setSessions] = useState<FocusSessionRecord[]>([]);
+  const [lastCompletedAt, setLastCompletedAt] = useState<number | null>(null);
   const [musicUrl, setMusicUrlState] = useState("");
   const [musicCollapsed, setMusicCollapsedState] = useState(false);
   const timerRef = useRef(timer);
@@ -118,6 +120,7 @@ useLayoutEffect(() => {
 
   const recordCompletion = useCallback(
     (event: SessionCompletedEvent) => {
+      setLastCompletedAt(event.completedAt);
       if (event.sessionType !== "focus") {
         notify(`${sessionLabel(event.sessionType)} complete`);
         return;
@@ -356,6 +359,7 @@ useLayoutEffect(() => {
     setTasks([]);
     setActiveTaskId(null);
     setSessions([]);
+    setLastCompletedAt(null);
     setMusicUrlState("");
     setMusicCollapsedState(false);
     notify("Local data has been cleared");
@@ -370,6 +374,7 @@ useLayoutEffect(() => {
       tasks: sortTasks(tasks),
       activeTaskId,
       sessions,
+      lastCompletedAt,
       musicUrl,
       musicCollapsed,
       dispatchTimer,
@@ -392,6 +397,7 @@ useLayoutEffect(() => {
       tasks,
       activeTaskId,
       sessions,
+      lastCompletedAt,
       musicUrl,
       musicCollapsed,
       dispatchTimer,
