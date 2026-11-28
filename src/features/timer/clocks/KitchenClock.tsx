@@ -53,7 +53,7 @@ export function KitchenClock({
       <div
         className={cn(
           "relative",
-          immersive ? "h-[min(72vmin,36rem)] w-[min(72vmin,36rem)]" : "h-64 w-64 sm:h-72 sm:w-72",
+          immersive ? "h-[min(80vmin,40rem)] w-[min(80vmin,40rem)]" : "h-64 w-64 sm:h-72 sm:w-72",
         )}
         role="img"
         aria-label={`${sessionLabel(sessionType)} remaining ${ready ? text : "not ready"}`}

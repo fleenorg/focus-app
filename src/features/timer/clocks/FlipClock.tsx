@@ -2,9 +2,8 @@
 
 import { cn } from "@/lib/cn";
 import { formatCountdown, sessionLabel } from "@/lib/time";
-import { useSyncExternalStore } from "react";
 import type { ClockFaceProps } from "./types";
-import { useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 function subscribeReducedMotion(onStoreChange: () => void) {
   const query = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -23,21 +22,33 @@ function useReducedMotion() {
 function FlipDigit({ value }: { value: string }) {
   const reduceMotion = useReducedMotion();
   const [settled, setSettled] = useState(value);
-  const [motion, setMotion] = useState<{ from: string; to: string } | null>(null);
+  const [motion, setMotion] = useState<{
+    from: string;
+    to: string;
+    id: number;
+  } | null>(null);
+  const motionId = useRef(0);
 
-  if (value !== settled) {
-    if (reduceMotion) {
-      setSettled(value);
-      if (motion) {
-        setMotion(null);
-      }
-    } else if (!motion || motion.to !== value) {
-      setMotion({ from: motion?.from ?? settled, to: value });
+  useEffect(() => {
+    if (value === settled || reduceMotion) {
+      return;
     }
-  }
 
-  const top = motion ? motion.to : settled;
-  const bottom = motion ? motion.from : settled;
+    const frame = requestAnimationFrame(() => {
+      motionId.current += 1;
+      setMotion((current) => ({
+        from: current?.to ?? settled,
+        to: value,
+        id: motionId.current,
+      }));
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [value, settled, reduceMotion]);
+
+  const displayedValue = reduceMotion ? value : settled;
+  const top = motion ? motion.to : displayedValue;
+  const bottom = motion ? motion.from : displayedValue;
 
   return (
     <span className="flip-digit" aria-hidden="true">
@@ -49,10 +60,14 @@ function FlipDigit({ value }: { value: string }) {
       </span>
       {motion ? (
         <>
-          <span className="flip-leaf flip-leaf-front">
+          <span
+            key={`front-${motion.id}`}
+            className="flip-leaf flip-leaf-front"
+          >
             <span>{motion.from}</span>
           </span>
           <span
+            key={`back-${motion.id}`}
             className="flip-leaf flip-leaf-back"
             onAnimationEnd={(event) => {
               if (event.animationName !== "flip-back") {
@@ -102,7 +117,7 @@ export function FlipClock({
       <div
         className={cn(
           "flip-clock flex items-center",
-          immersive ? "text-[clamp(4.5rem,14vmin,10rem)]" : "text-[clamp(3rem,9vw,5.4rem)]",
+          immersive ? "text-[clamp(5rem,16vmin,12rem)]" : "text-[clamp(3rem,9vw,5.4rem)]",
         )}
         role="img"
         aria-label={`${sessionLabel(sessionType)} remaining ${

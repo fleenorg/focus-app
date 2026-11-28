@@ -23,7 +23,7 @@ export function ClassicClock({
       className={cn(
         "relative flex items-center justify-center",
         immersive
-          ? "h-[min(78vmin,40rem)] w-[min(78vmin,40rem)]"
+          ? "h-[min(84vmin,44rem)] w-[min(84vmin,44rem)]"
           : "h-64 w-64 sm:h-72 sm:w-72",
       )}
       aria-live="off"
@@ -59,7 +59,7 @@ export function ClassicClock({
           className={cn(
             "mt-1 font-mono font-medium tracking-tight text-foreground",
             immersive
-              ? "text-[clamp(4.5rem,12vmin,8.5rem)]"
+              ? "text-[clamp(5rem,13vmin,9.5rem)]"
               : "text-6xl sm:text-7xl",
           )}
           aria-label={`${sessionLabel(sessionType)} remaining ${

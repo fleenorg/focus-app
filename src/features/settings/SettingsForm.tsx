@@ -9,6 +9,7 @@ import { DEFAULT_TIMER_SETTINGS, TIMER_LIMITS } from "@/config/app";
 import { useGuestApp } from "@/features/app/GuestAppProvider";
 import type { TimerSettings } from "@/types/domain";
 import { FormEvent, useEffect, useState } from "react";
+import { CLOCK_STYLE_OPTIONS } from "@/features/timer/clocks/registry";
 
 export function SettingsForm() {
   const { settings, updateSettings, resetLocalData, timer } = useGuestApp();
@@ -92,6 +93,42 @@ export function SettingsForm() {
               setDraft((current) => ({ ...current, longBreakInterval }))
             }
           />
+
+          <fieldset>
+            <legend className="text-sm font-medium">Clock style</legend>
+
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              {CLOCK_STYLE_OPTIONS.map((option) => (
+                <label
+                  key={option.id}
+                  className="cursor-pointer rounded-lg border border-border p-4 transition-colors hover:border-accent"
+                >
+                  <input
+                    type="radio"
+                    name="clock-style"
+                    value={option.id}
+                    checked={draft.timerStyle === option.id}
+                    onChange={() =>
+                      setDraft((current) => ({
+                        ...current,
+                        timerStyle: option.id,
+                      }))
+                    }
+                    className="sr-only"
+                  />
+
+                  <span className="block text-sm font-medium">
+                    {option.label}
+                  </span>
+
+                  <span className="mt-1 block text-xs text-muted">
+                    {option.description}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
           <label className="flex items-center gap-3 text-sm">
             <input
               type="checkbox"

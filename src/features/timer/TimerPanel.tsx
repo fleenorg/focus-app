@@ -33,7 +33,13 @@ export function TimerPanel() {
 
   return (
     <Card className="px-6 py-8 sm:px-10">
-      <div ref={stageRef} className="timer-stage flex flex-col items-center">
+      <div
+        ref={stageRef}
+        className={cn(
+          "timer-stage flex flex-col items-center",
+          isFullscreen && "h-screen min-h-screen w-screen justify-center px-6 py-8",
+        )}
+      >
         {!isFullscreen ? (
           <div
             className="mb-6 grid w-full grid-cols-3 gap-1 rounded-full bg-background p-1"

@@ -15,9 +15,4 @@ export const CLOCK_STYLE_OPTIONS: Array<{
     label: "Vintage flip",
     description: "Split-flap desk clock",
   },
-  {
-    id: "kitchen",
-    label: "Kitchen timer",
-    description: "Mechanical analog dial",
-  },
 ];
